@@ -1,0 +1,16 @@
+# Descrição das variáveis do dataset de filmes
+
+# PREVISORES:
+    * vote_average              - Numérica Contínua (0 a 10) - Média das avaliações
+    * vote_count                - Numérica Discreta - Quantidade de votos
+    * release_year              - Numérica Ordinal - Ano de lançamento
+    * release_month             - Numérica Ordinal (1 a 12) - Mês de lançamento
+    * runtime                   - Numérica Discreta - Duração em minutos (>=70)
+    * budget                    - Numérica Contínua - Orçamento em dólares (>=1000)
+    * original_language         - Categórica Nominal (en / es / fr / etc) - Idioma original
+    * popularity                - Numérica Contínua - Popularidade do filme
+    * genre_main                - Categórica Nominal (Action / Drama / Comedy / etc) - Gênero principal
+    * country_main              - Categórica Nominal (United States of America / etc) - País principal
+
+# OBJETIVO:
+    * revenue                   - Numérica Contínua - Bilheteria em dólares
