@@ -10,7 +10,7 @@ Created on Wed May 13 12:10:40 2026
 # Configure aqui quais etapas do pré processamento deverão ser realizadas
 _LABEL_ENCODER = True   # Não desativar label_encoder
 _VARIAVEIS_DUMMY = True
-_PADRONIZACAO = True
+_PADRONIZACAO = False
 
 # =============================================================================
 
@@ -22,14 +22,19 @@ _PADRONIZACAO = True
 
 # Função Auxiliar para carregar e tratar a base na primeira execução
 def carregarETratarBase():
+    import os
+    import pandas as pd
+    
     # =============================================================================
     #                              Carregando a base
     # =============================================================================
     
-    base = pd.read_csv('./Filmes_TMDB.csv', sep=',', encoding='latin-1')
+    _diretorio_atual = os.path.dirname(os.path.abspath(__file__))
+    _caminho_base = os.path.join(_diretorio_atual, 'Filmes_TMDB.csv')
     
-    # Listar nomes das colunas
-    print(base.columns.tolist())
+    base = pd.read_csv(_caminho_base, sep=',', encoding='latin-1')
+    
+    # print(base.columns.tolist())
     
     _colunas_selecionadas = [
         'vote_average',
@@ -41,7 +46,7 @@ def carregarETratarBase():
         'adult',
         'budget',
         'original_language',
-        'popularity',
+        # 'popularity',
         'genres',
         'production_countries'
     ]
@@ -92,23 +97,18 @@ def carregarETratarBase():
 
 
 
-
 import os
-
-_arquivo = './Filmes_TMDB_Tratada.csv'
-_base_tratada_existe = os.path.exists(_arquivo)
-
 import pandas as pd
 
-# Só realiza o tratamento da base de dados caso ainda não tenha sido exportada
-    # Ou seja, apenas na primeira execução
+_diretorio_atual = os.path.dirname(os.path.abspath(__file__))
+_arquivo = os.path.join(_diretorio_atual, 'Filmes_TMDB_Tratada.csv')
+
+_base_tratada_existe = os.path.exists(_arquivo)
+
 if _base_tratada_existe:
     base_tratada = pd.read_csv(_arquivo, sep=',', encoding='latin-1')
 else:
-    base_tratada = carregarETratarBase()
-    
-    
-    
+    base_tratada = carregarETratarBase()   
     
 
 # =============================================================================
@@ -117,7 +117,7 @@ else:
 
 _cols_previsores = [
     'vote_average',
-    'vote_count',
+    # 'vote_count',
     # 'status',         # Campo utilizado apenas para filtrar
     # 'release_date',
     'release_year',
@@ -127,7 +127,7 @@ _cols_previsores = [
     # 'adult',          # Sobraram apenas não adultos
     'budget',
     'original_language',
-    'popularity',
+    # 'popularity',
     # 'genres',
     'genre_main',
     # 'production_countries',
