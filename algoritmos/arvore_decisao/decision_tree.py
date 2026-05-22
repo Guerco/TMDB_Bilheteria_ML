@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 13 14:38:02 2026
+Created on Thu May 14 21:23:33 2026
 
 @author: BIEL
 """
@@ -16,16 +16,27 @@ import numpy as np
 
 # Arquivo separado
 
-################## Regressão Linear Múltipla ################## 
+################## Regressão com Árvores de Decisão ################## 
 
-from sklearn.linear_model import LinearRegression
-_regressor = LinearRegression()
+
+
+_ALTURA = 5
+
+from sklearn.tree import DecisionTreeRegressor
+_regressor = DecisionTreeRegressor(
+        max_depth = _ALTURA,
+        random_state = 0
+    )
 
 #  Treinamento
 _regressor.fit(previsores_treinamento, objetivo_treinamento)
 
 # Teste
 previsoes = _regressor.predict(previsores_teste)
+
+
+
+
 
 ################## Avaliação dos resultados ################## 
 
@@ -44,6 +55,32 @@ print('Mean Absolute Error:', f'{_mae:.2f}'.replace('.', ','))
 print('Mean Squared Error:', f'{_mse:.5f}'.replace('.', ','))  
 print('Root Mean Squared Error:', f'{_rmse:.2f}'.replace('.', ','))
 
-# Parâmetros estimados para o modelo
-coef_0 = _regressor.intercept_
-coeficientes = _regressor.coef_
+
+
+
+
+# =============================================================================
+#                              Exportando a Árvore
+# =============================================================================
+
+# from sklearn.tree import export_graphviz
+# export_graphviz(_regressor,out_file="tree.dot",
+#                 feature_names=_cols_previsores, 
+#                 impurity=False, filled=True)
+
+# # Visualizando a árvore
+# import graphviz
+# with open("tree.dot") as f:
+#     dot_graph = f.read()
+# display(graphviz.Source(dot_graph))
+
+# # Visualizando a importância das características
+# import matplotlib.pyplot as plt
+# import numpy as np
+# n_features = previsores.columns.size
+# plt.barh(range(n_features), _regressor.feature_importances_, align='center')
+# plt.yticks(np.arange(n_features), previsores.columns)
+# plt.xlabel("Feature importance")
+# plt.ylabel("Feature")
+
+

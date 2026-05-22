@@ -8,9 +8,10 @@ Created on Wed May 13 12:10:40 2026
 # =============================================================================
 
 # Configure aqui quais etapas do pré processamento deverão ser realizadas
-_LABEL_ENCODER = True   # Não desativar label_encoder
-_VARIAVEIS_DUMMY = True
-_PADRONIZACAO = False
+_LABEL_ENCODER         = True   # Não desativar label_encoder
+_VARIAVEIS_DUMMY       = True
+_PADRONIZACAO          = False
+_PADRONIZACAO_OBJETIVO = False
 
 # =============================================================================
 
@@ -54,7 +55,7 @@ def carregarETratarBase():
     base = base[_colunas_selecionadas]
     
     # =============================================================================
-    #                     Tratando valores inválidos
+    #                           Tratamento dos valores
     # =============================================================================
     
     base_tratamento = base.copy()
@@ -67,10 +68,6 @@ def carregarETratarBase():
     base_tratamento.drop(base_tratamento[base_tratamento['budget'] < 1000].index, inplace=True)
     base_tratamento.drop(base_tratamento[base_tratamento['runtime'] < 70].index, inplace=True)
     
-    # =============================================================================
-    #                     Separando dados em previsores e classe
-    # =============================================================================
-    
     # Convertendo data para mês e ano
     base_tratamento['release_date'] = pd.to_datetime(base_tratamento['release_date'])
     base_tratamento['release_year'] = base_tratamento['release_date'].dt.year
@@ -79,7 +76,7 @@ def carregarETratarBase():
     # Selecionando apenas os gêneros e países principais
     base_tratamento['genre_main'] = base_tratamento['genres'].str.split(', ').str[0]
     base_tratamento['country_main'] = base_tratamento['production_countries'].str.split(', ').str[0]
-    
+
     # =============================================================================
     #                     Exportando base_tratamento para CSV
     # =============================================================================
@@ -128,11 +125,15 @@ _cols_previsores = [
     'budget',
     'original_language',
     # 'popularity',
-    # 'genres',
-    'genre_main',
     # 'production_countries',
-    'country_main'
+    'country_main',
+    # 'region',
 ]
+
+if _VARIAVEIS_DUMMY:
+    _cols_previsores.append('genres')
+else:
+    _cols_previsores.append('genre_main')   
 
 _cols_objetivo = [
     'revenue'
@@ -173,7 +174,7 @@ if _LABEL_ENCODER:
         
         _le_genre_main = LabelEncoder()
         previsores.loc[:, 'genre_main'] = _le_genre_main.fit_transform(previsores.loc[:, 'genre_main'])
-        previsores['genre_main'] = previsores['genre_main'].astype('int64')        
+        previsores['genre_main'] = previsores['genre_main'].astype('int64')   
         
         
 
@@ -185,7 +186,9 @@ if _LABEL_ENCODER:
 
 if _VARIAVEIS_DUMMY:
     from sklearn.preprocessing import LabelBinarizer
+    from sklearn.preprocessing import MultiLabelBinarizer
     _lb = LabelBinarizer()
+    _mlb = MultiLabelBinarizer()
 
     # Variavel original_language
     _variaveis_dummy = _lb.fit_transform(previsores['original_language'])
@@ -194,16 +197,20 @@ if _VARIAVEIS_DUMMY:
     previsores = previsores.join(_df_variaveis_dummy)
     previsores = previsores.drop('original_language',axis=1)
     
-    # Variavel genre_main
-    _variaveis_dummy = _lb.fit_transform(previsores['genre_main'])
-    _novas_variaveis_dummy = _lb.classes_
-    _df_variaveis_dummy = pd.DataFrame(_variaveis_dummy, columns=_novas_variaveis_dummy)
-    previsores = previsores.join(_df_variaveis_dummy)
-    previsores = previsores.drop('genre_main',axis=1)
+    # Variavel genres    
+    _generos_split = base_tratada['genres'].str.split(', ')
+    _variaveis_dummy_generos = _mlb.fit_transform(_generos_split)
+    _df_dummy_generos = pd.DataFrame(
+        _variaveis_dummy_generos, 
+        columns=_mlb.classes_
+    )
+    previsores = previsores.reset_index(drop=True)
+    previsores = pd.concat([previsores, _df_dummy_generos], axis=1)
+    previsores = previsores.drop('genres', axis=1)
     
-
-
-
+    
+    
+    
 
 # =============================================================================
 #                 Separando em base de testes e treinamento
@@ -218,17 +225,22 @@ previsores_treinamento, previsores_teste, objetivo_treinamento, objetivo_teste =
 
 
 
-# # =============================================================================
-# #                     Padronização dos dados
-# # =============================================================================
+# =============================================================================
+#                     Padronização dos dados
+# =============================================================================
 
-if _PADRONIZACAO:
+if _PADRONIZACAO or _PADRONIZACAO_OBJETIVO:
     from sklearn.preprocessing import StandardScaler
     
+if _PADRONIZACAO:
     _scaler = StandardScaler()
     previsores_treinamento = _scaler.fit_transform(previsores_treinamento)
     previsores_teste = _scaler.transform(previsores_teste)
 
+if _PADRONIZACAO_OBJETIVO:
+    _scaler_objetivo = StandardScaler()
+    objetivo_treinamento = _scaler_objetivo.fit_transform(objetivo_treinamento)
+    objetivo_teste = _scaler_objetivo.transform(objetivo_teste)
 
 
 
