@@ -27,9 +27,9 @@ from sklearn.model_selection import KFold
 
 # =============================================================================
 
-# Função MAPE
-def mean_absolute_percentage_error(y_true, y_pred): 
-    return np.mean(np.abs(((y_true - y_pred) / y_true)) * 100)
+# Função WAPE
+def weighted_absolute_percentage_error(y_true, y_pred):
+    return np.sum(np.abs(y_true - y_pred)) / np.sum(np.abs(y_true))
 
 
 
@@ -46,7 +46,7 @@ scores = []
 maes = []
 mses = []
 rmses = []
-mapes = []
+wapes = []
 
 if not isinstance(previsores, np.ndarray):
     previsores = previsores.values
@@ -118,13 +118,13 @@ for indice_treinamento, indice_teste in kfold.split(previsores):
     mae = metrics.mean_absolute_error(y_teste, previsoes)
     mse = metrics.mean_squared_error(y_teste, previsoes)
     rmse = np.sqrt(mse)
-    mape = mean_absolute_percentage_error(y_teste, previsoes)
+    wape = weighted_absolute_percentage_error(y_teste, previsoes)
 
     scores.append(score)
     maes.append(mae)
     mses.append(mse)
     rmses.append(rmse)
-    mapes.append(mape)
+    wapes.append(wape)
 
 
 ######################## Resultado final ########################
@@ -145,22 +145,22 @@ rmses = np.asarray(rmses)
 rmse_final_medio = rmses.mean()
 rmse_final_desvio_padrao = rmses.std()
 
-mapes = np.asarray(mapes)
-mape_final_medio = mapes.mean()
-mape_final_desvio_padrao = mapes.std()
+wapes = np.asarray(wapes)
+wape_final_medio = wapes.mean()
+wape_final_desvio_padrao = wapes.std()
 
 print("\n--- Resultados Finais ---")
 
 print("\n    - Médios -")
 print(f"R²Score Médio: {score_final_medio:.5f}".replace('.', ','))
-print(f"MAPE Médio: {mape_final_medio:.2f}%".replace('.', ','))
+print(f"WAPE Médio: {wape_final_medio:.5f}".replace('.', ','))
 print(f"MAE Médio: {mae_final_medio:.2f}".replace('.', ','))
 print(f"RMSE Médio: {rmse_final_medio:.5f}".replace('.', ','))
 print(f"MSE Médio: {mse_final_medio:.5f}".replace('.', ','))
 
 print("\n\n    - Desvios Padrão -")
 print(f"R²Score Desvio Padrão: {score_final_desvio_padrao:.5f}".replace('.', ','))
-print(f"MAPE Desvio Padrão: {mape_final_desvio_padrao:.2f}%".replace('.', ','))
+print(f"WAPE Desvio Padrão: {wape_final_desvio_padrao:.5f}".replace('.', ','))
 print(f"MAE Desvio Padrão: {mae_final_desvio_padrao:.2f}".replace('.', ','))
 print(f"RMSE Desvio Padrão: {rmse_final_desvio_padrao:.5f}".replace('.', ','))
 print(f"MSE Desvio Padrão: {mse_final_desvio_padrao:.5f}".replace('.', ','))
@@ -179,7 +179,7 @@ sns.despine(top=True, right=False, left=False, bottom=False, offset=None, trim=F
 # Usando o modelo da última iteração (último fold) para plotar os gráficos
 if _VC_PADRONIZACAO:
     previsoes_treinamento_scaled = regressor.predict(X_treino_scaled)
-    previsoes_treinamento = _scaler_y.inverse_transform(previsoes_treinamento_scaled.reshape(-1, 1))
+    # previsoes_treinamento = _scaler_y.inverse_transform(previsoes_treinamento_scaled.reshape(-1, 1))
 else:
     previsoes_treinamento = regressor.predict(X_treino)
 
