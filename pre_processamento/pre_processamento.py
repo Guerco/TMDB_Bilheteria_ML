@@ -8,10 +8,10 @@ Created on Wed May 13 12:10:40 2026
 # =============================================================================
 
 # Configure aqui quais etapas do pré processamento deverão ser realizadas
-_LABEL_ENCODER         = True   # Não desativar label_encoder
+_LABEL_ENCODER         = False  
 _VARIAVEIS_DUMMY       = True
-_PADRONIZACAO          = False
-_PADRONIZACAO_OBJETIVO = False
+_PADRONIZACAO          = True
+_PADRONIZACAO_OBJETIVO = True
 
 # =============================================================================
 
@@ -122,7 +122,7 @@ _cols_previsores = [
     # 'revenue',
     'runtime',
     # 'adult',          # Sobraram apenas não adultos
-    'budget',
+    # 'budget',
     'original_language',
     # 'popularity',
     # 'production_countries',
@@ -208,6 +208,12 @@ if _VARIAVEIS_DUMMY:
     previsores = pd.concat([previsores, _df_dummy_generos], axis=1)
     previsores = previsores.drop('genres', axis=1)
     
+    #Variavel country
+    _dummy_country = _lb.fit_transform(previsores['country_main'])
+    _novas_vars_country = [f"country_{c}" for c in _lb.classes_] # Evita conflito de nomes
+    _df_dummy_country = pd.DataFrame(_dummy_country, columns=_novas_vars_country)
+    previsores = previsores.join(_df_dummy_country)
+    previsores = previsores.drop('country_main', axis=1)
     
     
     
