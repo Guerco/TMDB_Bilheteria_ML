@@ -17,7 +17,7 @@ test_accuracy = []
 # tentando diferentes valores de max_depth
 neighbors_settings = range(1, 30)
 for k in neighbors_settings:
-    classificador = DecisionTreeRegressor(max_depth=k, random_state=0)
+    classificador = DecisionTreeRegressor(max_depth=k, random_state=0, criterion='poisson')
     classificador.fit(previsores_treinamento, objetivo_treinamento)    
     training_accuracy.append(classificador.score(previsores_treinamento, objetivo_treinamento))
     test_accuracy.append(classificador.score(previsores_teste, objetivo_teste))

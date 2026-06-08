@@ -20,10 +20,11 @@ import numpy as np
 
 
 
-_ALTURA = 5
+_ALTURA = 3
 
 from sklearn.tree import DecisionTreeRegressor
 _regressor = DecisionTreeRegressor(
+        # criterion = 'poisson',
         max_depth = _ALTURA,
         random_state = 0
     )

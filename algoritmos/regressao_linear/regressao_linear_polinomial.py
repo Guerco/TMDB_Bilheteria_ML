@@ -18,7 +18,7 @@ import numpy as np
 
 ################## Regressão Polinomial ################## 
 
-_DEGREE = 2
+_DEGREE = 3
 
 from sklearn.preprocessing import PolynomialFeatures
 _poly = PolynomialFeatures(degree = _DEGREE)
